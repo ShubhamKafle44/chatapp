@@ -8,6 +8,7 @@ const socket = io(import.meta.env.VITE_WS_URL, {
 export const Chat = () => {
   const [isConnected, setIsConnected] = useState(socket.connected);
   const [messages, setMessages] = useState([]);
+  const [message, setMessage] = useState("");
   useEffect(() => {
     socket.on("connect", () => {
       setIsConnected(socket.connect());
@@ -24,13 +25,41 @@ export const Chat = () => {
         { ...data, type: "join" },
       ]);
     });
+    socket.on("chat", (data) => {
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { ...data, type: "chat" },
+      ]);
+    });
   }, []);
 
   return (
     <>
       <h2>status: {isConnected ? "connected" : "disconnected"}</h2>
       <div>
-        <Message />
+        {messages.map((message, index) => (
+          <Message message={message} key={index} />
+        ))}
+        <input
+          type="text"
+          id="message"
+          onChange={(event) => {
+            const value = event.target.value.trim();
+            setMessage(value);
+          }}
+        ></input>
+        <button
+          onClick={() => {
+            if (message && message.length) {
+              socket.emit("chat", message);
+            }
+            var messageBox = document.getElementById("message");
+            messageBox.value = "";
+            setMessage("");
+          }}
+        >
+          Send
+        </button>
       </div>
     </>
   );
