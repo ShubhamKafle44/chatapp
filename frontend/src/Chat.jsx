@@ -1,6 +1,7 @@
 import { io } from "socket.io-client";
 import React, { useEffect, useState } from "react";
 import { Message } from "./Message";
+
 const socket = io(import.meta.env.VITE_WS_URL, {
   path: import.meta.env.VITE_PATH,
 });
